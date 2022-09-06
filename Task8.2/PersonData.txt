@@ -1,0 +1,5 @@
+auTHor, Emma
+Age, 25
+salary, 1234
+numBer, 2
+BirthDate, 13.09.65
