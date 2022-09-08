@@ -11,7 +11,7 @@ public class Program
     {
         var data = LineReader.LineConversion("PersonData.txt");
         SimpleBinder person = SimpleBinder.GetInstance;
-        var p = person.Bind("Task8._2.Person", data);
+        var p = person.Bind<Person>(data);
         Console.WriteLine(p?.ToString());
     }
 }

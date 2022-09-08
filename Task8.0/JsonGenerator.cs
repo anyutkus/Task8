@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.IO;
 
 namespace Task8._0
 {
@@ -12,7 +13,7 @@ namespace Task8._0
                 WriteIndented = true,
             };
 
-            if ((name.Length < 5) || (name[^5..] != ".json"))
+            if (!Path.HasExtension($"@{name}"))
             {
                 name += ".json";
             }

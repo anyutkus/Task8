@@ -15,9 +15,9 @@ namespace Task8._2
             get => _instance;
         }
 
-        public dynamic? Bind(string typeName, Dictionary<string, string> dictionary)
+        public dynamic? Bind<T>(Dictionary<string, string> dictionary) where T : new()
         {
-            var type = TypeCheck(typeName);
+            var type = typeof(T);
 
             if (dictionary is null)
             {
@@ -46,10 +46,10 @@ namespace Task8._2
                                 member.SetValue(result, data.Value);
                                 break;
                             case "Int32":
-                                member.SetValue(result, Int32.Parse(data.Value));
+                                member.SetValue(result, int.Parse(data.Value));
                                 break;
                             case "Double":
-                                member.SetValue(result, Double.Parse(data.Value));
+                                member.SetValue(result, double.Parse(data.Value));
                                 break;
                         }
                     }
@@ -61,28 +61,6 @@ namespace Task8._2
             }
 
             return result;
-        }
-
-        private static Type TypeCheck(string typeName)
-        {
-            if (String.IsNullOrEmpty(typeName))
-            {
-                throw new ArgumentException();
-            }
-
-            var type = Type.GetType(typeName);
-
-            if (type == null)
-            {
-                throw new ArgumentNullException("This type does not exist", nameof(type));
-            }
-
-            if (type.GetConstructor(Type.EmptyTypes) == null)
-            {
-                throw new ArgumentOutOfRangeException(nameof(type), "Must have constructor without parameters");
-            }
-
-            return type;
         }
 
         private static dynamic? GetNotNullMember(PropertyInfo? propertyInfo, FieldInfo? fieldInfo)

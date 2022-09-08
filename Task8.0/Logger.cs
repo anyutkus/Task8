@@ -2,12 +2,12 @@
 
 namespace Task8._0
 {
-    public class Logger<T>
+    public class Logger
     {
-        private static readonly Type _type = typeof(T);
-
-        public Logger(string name, T item)
+        public static void Track<T>(string name, T item)
         {
+            Type _type = typeof(T);
+
             if (item == null)
             {
                 throw new ArgumentNullException();
@@ -15,38 +15,29 @@ namespace Task8._0
 
             if (_type.GetCustomAttribute<TrackingEntityAttribute>() != null)
             {
-                new JsonGenerator(name, Track(item));
+                Dictionary<string, string> _data = new();
+
+                var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
+                var properties = _type.GetProperties(flags);
+                var fields = _type.GetFields(flags);
+
+                AttributeCheck(_data, properties, item);
+                AttributeCheck(_data, fields, item);
+                new JsonGenerator(name, _data);
             }
         }
 
-        public Dictionary<string, string> Track(T item)
+        private static void AttributeCheck(Dictionary<string, string> data, dynamic info, dynamic item)
         {
-            Dictionary<string, string> _data = new();
-
-            var members = _type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            foreach (var el in members)
+            foreach (var inf in info)
             {
-                var attr = el.GetCustomAttribute<TrackingPropertyAttribute>();
+                TrackingPropertyAttribute MyAttribute = (TrackingPropertyAttribute)Attribute.GetCustomAttribute(inf, typeof(TrackingPropertyAttribute));
 
-                if (attr != null)
+                if (MyAttribute != null)
                 {
-                    _data.Add(attr.PropertyName ?? el.Name, GetMemberValue(el, item) ?? "");
+                    data.Add(MyAttribute.PropertyName ?? inf.Name, inf.GetValue(item)?.ToString() ?? "");
                 }
-            }
-            return _data;
-        }
-
-        private static string? GetMemberValue(MemberInfo memberInfo, T item)
-        {
-            switch (memberInfo.MemberType)
-            {
-                case MemberTypes.Field:
-                    return ((FieldInfo)memberInfo).GetValue(item)?.ToString();
-                case MemberTypes.Property:
-                    return ((PropertyInfo)memberInfo).GetValue(item)?.ToString();
-                default:
-                    return null;
             }
         }
     }
